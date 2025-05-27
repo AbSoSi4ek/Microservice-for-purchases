@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace MarketplaceSale.Domain.ValueObjects
 {
-    public class Description(string description)
-        : ValueObject<string>(new DescriptionValidator(), description);
+    public class Description(string value)
+        : ValueObject<string>(new DescriptionValidator(), value);
 
 }
 
 /*
  
-public sealed class Description : ValueObject<string>
+public sealed class value : ValueObject<string>
 {
-    public Description(string value)
+    public value(string value)
         : base(new DescriptionValidator(), value) { }
 
     public int Length => Value.Length;

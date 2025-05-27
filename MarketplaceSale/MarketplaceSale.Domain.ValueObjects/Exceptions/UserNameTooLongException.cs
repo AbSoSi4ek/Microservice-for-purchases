@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace MarketplaceSale.Domain.ValueObjects.Exceptions
 {
-    public class UserNameTooLongException(string value, int minLength)
-        : FormatException($"Product name '{value}' is shorter than minimum allowed length {minLength}")
+    public class UserNameTooLongException(string value, int maxLength)
+        : FormatException($"Product name '{value}' is longer than minimum allowed length {maxLength}")
     {
         public string Value => value;
-        public int MinLength => minLength;
+        public int MaxLength => maxLength;
     }
 }

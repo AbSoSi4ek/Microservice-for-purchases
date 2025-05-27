@@ -12,7 +12,7 @@ namespace MarketplaceSale.Domain.ValueObjects.Validators
     {
         public void Validate(decimal value)
         {
-            if (value <= 0)
+            if (value < 0)
                 throw new MoneyNonPositiveException(ExceptionMessages.MONEY_MUST_BE_POSITIVE, nameof(value), value);
             if (decimal.Round(value, 2) != value)
                 throw new MoneyHasMoreThanTwoDecimalPlacesException(ExceptionMessages.MONEY_MAX_TWO_DECIMAL_PLACES, nameof(value), value);

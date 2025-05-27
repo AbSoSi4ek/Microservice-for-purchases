@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MarketplaceSale.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace MarketplaceSale.Domain.Repositories.Abstractions
 {
-    internal class IOrderRepository
+    public interface IOrderRepository : IRepository<Order, Guid>
     {
+        Task<IReadOnlyList<Order>> GetByOrderIdAsync(Guid orderId, CancellationToken cancellationToken = default);
     }
 }

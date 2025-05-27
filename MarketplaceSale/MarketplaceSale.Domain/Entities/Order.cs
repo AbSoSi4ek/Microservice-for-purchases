@@ -7,6 +7,7 @@ using MarketplaceSale.Domain.ValueObjects;
 using MarketplaceSale.Domain.Enums;
 using MarketplaceSale.Domain.Entities.Base;
 using MarketplaceSale.Domain.Exceptions;
+using System.Collections.ObjectModel;
 
 
 namespace MarketplaceSale.Domain.Entities
@@ -15,17 +16,28 @@ namespace MarketplaceSale.Domain.Entities
     {
         #region Fields
 
-        private readonly ICollection<OrderLine> _orderLines = [];
-        private readonly Dictionary<Product, Quantity> _returnedProducts = [];
-        private readonly Dictionary<Seller, ReturnStatus> _returnStatuses = [];
+        private readonly ICollection<OrderLine> _orderLines = new List<OrderLine>();
+        private readonly Dictionary<Product, Quantity> _returnedProducts = new Dictionary<Product, Quantity>();
+        private readonly Dictionary<Seller, ReturnStatus> _returnStatuses = new Dictionary<Seller, ReturnStatus>();
+
+
 
         #endregion
 
         #region Properties
 
+        private Order() { }
         public Client Client { get; private set; }
+        //public Guid ClientId { get; private set; }
+        public Client? ClientReturning { get; private set; } // потому что этот мудак не умеет делать связь 😥
+        // EF Core — одно навигационное свойство = одна связь. Но нахуй его отправляли многократно
 
-        public IReadOnlyCollection<OrderLine> OrderLines => _orderLines.ToList().AsReadOnly();
+        public Seller Seller { get; private set; }
+
+        //public Guid SellerId { get; private set; }
+
+        public IReadOnlyCollection<OrderLine> OrderLines => new ReadOnlyCollection<OrderLine>(_orderLines.ToList());
+
 
         public IReadOnlyDictionary<Product, Quantity> ReturnedProducts => _returnedProducts;
         public IReadOnlyDictionary<Seller, ReturnStatus> ReturnStatuses => _returnStatuses;
@@ -73,11 +85,39 @@ namespace MarketplaceSale.Domain.Entities
 
         #region Behavior
 
+        //также добавить методы для изменения количества в ордерлайне, в карте и картлайне ессть допы
+
         public Money CalculateTotal() // стоимость всего заказа
         {
             return new Money(_orderLines.Sum(l => l.Product.Price.Value * l.Quantity.Value));
         }
 
+        /*public void AddProduct(Product product, Quantity quantity)
+        {
+            if (product is null)
+                throw new ArgumentNullValueException(nameof(product));
+            if (quantity is null || quantity.Value <= 0)
+                throw new QuantityMustBePositiveException(product, quantity);
+
+            var line = _orderLines.FirstOrDefault(l => l.Product == product);
+            if (line != null)
+            {
+                line.IncreaseQuantity(quantity);
+            }
+            else
+            {
+                _orderLines.Add(new OrderLine(product, quantity));
+            }
+        }
+
+        public void RemoveProduct(Product product)
+        {
+            var line = _orderLines.FirstOrDefault(l => l.Product == product);
+            if (line == null)
+                throw new ProductNotInCartException(product);
+
+            _orderLines.Remove(line);
+        }*/
 
         public void MarkAsPaid() // заказ оплачен
         {
@@ -88,7 +128,11 @@ namespace MarketplaceSale.Domain.Entities
             {
                 var seller = line.Product.Seller;
                 seller.ReduceProductStock(line.Product, line.Quantity);
-                seller.AddBalance(CalculateTotal());
+                var sellerSum = _orderLines
+                    .Where(l => l.Product.Seller == seller)
+                    .Sum(l => l.Product.Price.Value * l.Quantity.Value);
+                seller.AddBalance(new Money(sellerSum));
+
                 seller.AddSaleHistory(this);
             }
 
@@ -109,13 +153,13 @@ namespace MarketplaceSale.Domain.Entities
                 throw new InvalidOrderStatusChangeException(Status, OrderStatus.Delivered);
 
             Status = OrderStatus.Delivered;
-            DeliveryDate = new DeliveryDate(DateTime.UtcNow); ;
+            DeliveryDate = new DeliveryDate(DateTime.UtcNow);
         }
 
         public void MarkAsCompleted() // заказ выполнен
         {
             if (Status != OrderStatus.Delivered)
-                throw new InvalidOrderStatusChangeException(Status, OrderStatus.Delivered);
+                throw new InvalidOrderStatusChangeException(Status, OrderStatus.Completed);
 
             Status = OrderStatus.Completed;
         }
@@ -247,4 +291,4 @@ namespace MarketplaceSale.Domain.Entities
         #endregion
     }
 }
-//я устал, я иду спать, спокойной ночи
+//ненавижу блять то что я делаю

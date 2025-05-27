@@ -13,6 +13,7 @@ namespace MarketplaceSale.Domain.Entities
     {
         #region Properties
 
+        //public Guid SellerId { get; private set; }
         public ProductName ProductName { get; private set; }
         public Description Description { get; private set; }
         public Money Price { get; private set; }
@@ -102,7 +103,7 @@ namespace MarketplaceSale.Domain.Entities
         {
             if (additionalQuantity.Value <= 0)
                 throw new QuantityMustBePositiveException(this, additionalQuantity);
-            if (additionalQuantity.Value >= StockQuantity.Value)
+            if (additionalQuantity.Value > StockQuantity.Value)
                 throw new QuantityDecreaseExceedsAvailableException(this, additionalQuantity, StockQuantity);
             if (seller != Seller)
                 throw new ProductDoesNotBelongToSellerException(this, seller);

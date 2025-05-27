@@ -8,6 +8,6 @@ using MarketplaceSale.Domain.ValueObjects.Validators;
 
 namespace MarketplaceSale.Domain.ValueObjects
 {
-    public class Quantity(int stockQuantity)
-        : ValueObject<int>(new StockQuantityValidator(), stockQuantity);
+    public class Quantity(int value)
+        : ValueObject<int>(new StockQuantityValidator(), value);
 }

@@ -15,8 +15,8 @@ namespace MarketplaceSale.Domain.Entities
     {
         #region Fields
 
-        private readonly ICollection<Product> _products = [];
-        private readonly ICollection<Order> _salesHistory = [];
+        private readonly ICollection<Product> _products = new List<Product>();
+        private readonly ICollection<Order> _salesHistory = new List<Order>();
 
         #endregion // Fields
 

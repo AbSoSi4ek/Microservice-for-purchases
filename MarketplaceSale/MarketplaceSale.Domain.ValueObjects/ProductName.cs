@@ -8,6 +8,6 @@ using MarketplaceSale.Domain.ValueObjects.Validators;
 
 namespace MarketplaceSale.Domain.ValueObjects
 {
-    public class ProductName(string ProductName)
-            : ValueObject<string>(new ProductNameValidator(), ProductName);
+    public class ProductName(string value)
+            : ValueObject<string>(new ProductNameValidator(), value);
 }

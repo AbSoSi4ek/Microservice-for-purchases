@@ -15,8 +15,8 @@ namespace MarketplaceSale.Domain.Entities
     {
         #region Fields
 
-        private readonly ICollection<Order> _purchaseHistory = [];
-        private readonly ICollection<Order> _returnHistory = [];
+        private readonly List<Order> _purchaseHistory = new List<Order>();
+        private readonly List<Order> _returnHistory = new List<Order>();
 
         #endregion // Fields
 
@@ -28,9 +28,13 @@ namespace MarketplaceSale.Domain.Entities
 
         public Cart Cart { get; private set; } = null!;
 
-        public IReadOnlyCollection<Order> PurchaseHistory => _purchaseHistory.ToList().AsReadOnly();
 
-        public IReadOnlyCollection<Order> ReturnHistory => _returnHistory.ToList().AsReadOnly();
+        public IReadOnlyCollection<Order> PurchaseHistory => _purchaseHistory.AsReadOnly();
+        public IReadOnlyCollection<Order> ReturnHistory => _returnHistory.AsReadOnly();
+
+        /*public IReadOnlyCollection<Order> PurchaseHistory => _purchaseHistory.ToList().AsReadOnly();
+
+        public IReadOnlyCollection<Order> ReturnHistory => _returnHistory.ToList().AsReadOnly();*/
 
         #endregion // Properties
 
@@ -59,9 +63,13 @@ namespace MarketplaceSale.Domain.Entities
         {
             if (product is null)
                 throw new ArgumentNullValueException(nameof(product));
-
+            bool productExistsInCart = Cart.CartLines.Any(cl => cl.Product == product);
+            if (!productExistsInCart)
+                throw new ProductNotFoundInCartException(product);
             Cart.RemoveProduct(product);
         }
+
+
 
         public void ClearCart() => Cart.ClearCart(); // Очистить корзину
 
@@ -271,4 +279,5 @@ namespace MarketplaceSale.Domain.Entities
 
         #endregion // Ordering
     }
+    
 }

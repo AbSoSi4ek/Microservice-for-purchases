@@ -17,7 +17,7 @@ namespace MarketplaceSale.Domain.Entities
     {
         #region Fields
 
-        private readonly ICollection<CartLine> _cartLines = [];
+        private readonly ICollection<CartLine> _cartLines = new List<CartLine>();
 
         #endregion
 
@@ -25,7 +25,12 @@ namespace MarketplaceSale.Domain.Entities
 
         public Client Client { get; private set; }
 
-        public IReadOnlyCollection<CartLine> CartLines => _cartLines.ToList().AsReadOnly();
+        //public Guid ClientId { get; private set; }
+
+        public IReadOnlyCollection<CartLine> CartLines => (IReadOnlyCollection<CartLine>)_cartLines;
+
+
+
 
         #endregion
 
@@ -43,6 +48,7 @@ namespace MarketplaceSale.Domain.Entities
 
         #region Behavior
 
+        // потом добавить методы для изменения количества продуктов в картлайне ChangeQuantity(Product product, Quantity quantity) или DecreaseProductQuantity
         public void AddProduct(Product product, Quantity quantity)
         {
             if (product is null)
@@ -51,6 +57,7 @@ namespace MarketplaceSale.Domain.Entities
                 throw new QuantityMustBePositiveException(product, quantity);
 
             var line = _cartLines.FirstOrDefault(l => l.Product == product);
+
             if (line != null)
             {
                 line.IncreaseQuantity(quantity);
@@ -64,6 +71,7 @@ namespace MarketplaceSale.Domain.Entities
         public void RemoveProduct(Product product)
         {
             var line = _cartLines.FirstOrDefault(l => l.Product == product);
+
             if (line == null)
                 throw new ProductNotInCartException(product);
 
@@ -140,96 +148,3 @@ namespace MarketplaceSale.Domain.Entities
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-
-    public class Cart : Entity<Guid>
-    {
-        #region Fields
-
-        private readonly List<Product> _products = [];
-
-        #endregion
-
-        #region Properties
-
-        public Client Client { get; private set; }
-
-        public IReadOnlyCollection<Product> Products => _products.AsReadOnly();
-
-        #endregion
-
-        #region Constructors
-
-        protected Cart() { }
-
-        public Cart(Client client)
-            : base(Guid.NewGuid())
-        {
-            Client = client ?? throw new ArgumentNullValueException(nameof(client));
-        }
-
-        #endregion
-
-        #region Behavior
-
-        public void AddProduct(Product product)
-        {
-            if (product == null)
-                throw new ArgumentNullValueException(nameof(product));
-
-            if (!_products.Contains(product))
-                _products.Add(product);
-        }
-
-        public void RemoveProduct(Product product)
-        {
-            if (!_products.Remove(product))
-                throw new InvalidOperationException("Product not found in cart.");
-        }
-
-        public IReadOnlyCollection<Product> GetCartProducts() { return _products; }
-
-        public void ClearCart()
-        {
-            _products.Clear();
-        }
-
-        public Money GetTotalPrice()
-        {
-            if (_products.Count == 0)
-                return new Money(0, Currency.RUB);
-
-            var currency = _products[0].Price.Currency;
-
-            decimal total = 0;
-            foreach (var product in _products)
-            {
-                if (product.Price.Currency != currency)
-                    throw new InvalidOperationException("All products in cart must have the same currency.");
-
-                total += product.Price.Amount;
-            }
-
-            return new Money(total, currency);
-        }
-
-        #endregion
-    }
-    */

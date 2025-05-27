@@ -19,9 +19,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{887F63
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{76654039-A683-48B5-96D8-8251EBEBBF3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketPlaceSale.Application.Models", "MarketPlaceSale.Application.Models\MarketPlaceSale.Application.Models.csproj", "{8F838E86-2F4B-4765-BB6C-E21C6919EF15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketPlaceSale.Application.Models", "MarketPlaceSale.Application.Models\MarketPlaceSale.Application.Models.csproj", "{8F838E86-2F4B-4765-BB6C-E21C6919EF15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketPlaceSale.Application.Services", "MarketPlaceSale.Application.Services\MarketPlaceSale.Application.Services.csproj", "{ECA1B703-4D31-4DCE-AB33-6A22EF9FD6F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketPlaceSale.Application.Services", "MarketPlaceSale.Application.Services\MarketPlaceSale.Application.Services.csproj", "{ECA1B703-4D31-4DCE-AB33-6A22EF9FD6F4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassTest", "ClassTest\ClassTest.csproj", "{62B8F3E6-8EAA-45BD-9DD3-18448BF13225}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketplaceSale.Infrastructure.EntityFramework", "MarketplaceSale.Infrastructure.EntityFramework\MarketplaceSale.Infrastructure.EntityFramework.csproj", "{8EFB7320-BD9B-4B15-9574-186D8F97BD64}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarketplaceSale.Infrastructure.Repositories.Implementation", "MarketplaceSale.Infrastructure.Repositories.Implementation\MarketplaceSale.Infrastructure.Repositories.Implementation.csproj", "{CF2C933E-036C-40A9-BDD4-A34E52100780}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{B35DF464-FE4D-4548-96CD-251A2A59AA51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "MarketplaceSale.Presentation\WebApi\WebApi.csproj", "{9A5C33D1-1B83-4605-8BDD-3E242CD8D07C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +63,22 @@ Global
 		{ECA1B703-4D31-4DCE-AB33-6A22EF9FD6F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECA1B703-4D31-4DCE-AB33-6A22EF9FD6F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECA1B703-4D31-4DCE-AB33-6A22EF9FD6F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62B8F3E6-8EAA-45BD-9DD3-18448BF13225}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62B8F3E6-8EAA-45BD-9DD3-18448BF13225}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62B8F3E6-8EAA-45BD-9DD3-18448BF13225}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62B8F3E6-8EAA-45BD-9DD3-18448BF13225}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EFB7320-BD9B-4B15-9574-186D8F97BD64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EFB7320-BD9B-4B15-9574-186D8F97BD64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EFB7320-BD9B-4B15-9574-186D8F97BD64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EFB7320-BD9B-4B15-9574-186D8F97BD64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF2C933E-036C-40A9-BDD4-A34E52100780}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF2C933E-036C-40A9-BDD4-A34E52100780}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF2C933E-036C-40A9-BDD4-A34E52100780}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF2C933E-036C-40A9-BDD4-A34E52100780}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A5C33D1-1B83-4605-8BDD-3E242CD8D07C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A5C33D1-1B83-4605-8BDD-3E242CD8D07C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A5C33D1-1B83-4605-8BDD-3E242CD8D07C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A5C33D1-1B83-4605-8BDD-3E242CD8D07C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +90,9 @@ Global
 		{FB74C7E1-30C4-456A-8A52-172B1F57685B} = {3C2CEEE4-1B1C-4F4D-BD95-AAA5F3AB435C}
 		{8F838E86-2F4B-4765-BB6C-E21C6919EF15} = {8206ABBA-7FC1-4B45-A358-0B945CFC71D8}
 		{ECA1B703-4D31-4DCE-AB33-6A22EF9FD6F4} = {8206ABBA-7FC1-4B45-A358-0B945CFC71D8}
+		{8EFB7320-BD9B-4B15-9574-186D8F97BD64} = {76654039-A683-48B5-96D8-8251EBEBBF3F}
+		{CF2C933E-036C-40A9-BDD4-A34E52100780} = {76654039-A683-48B5-96D8-8251EBEBBF3F}
+		{9A5C33D1-1B83-4605-8BDD-3E242CD8D07C} = {B35DF464-FE4D-4548-96CD-251A2A59AA51}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {342B549F-5F76-487F-BE61-A62A9D92A140}

@@ -16,9 +16,9 @@ namespace MarketplaceSale.Domain.ValueObjects
     /// Represents type of the money.
     /// </summary>
     /// <param name="amount">The amount of the money.</param>
-    public class Money(decimal amountInRub) : ValueObject<decimal>(
+    public class Money(decimal value) : ValueObject<decimal>(
         new MoneyValidator(),
-        Math.Round(amountInRub, 2, MidpointRounding.AwayFromZero))
+        Math.Round(value, 2, MidpointRounding.AwayFromZero))
     {
         public static Money operator +(Money m1, Money m2)
             => new(m1.Value + m2.Value);
@@ -29,8 +29,8 @@ namespace MarketplaceSale.Domain.ValueObjects
         public static Money operator *(Money money, int multiplier)
             => new(money.Value * multiplier);
 
-        public static Money operator *(int multiplier, Money money)
-            => new(money.Value * multiplier);
+        public static Money operator /(int multiplier, Money money)
+            => new(money.Value / multiplier);
 
         public static bool operator >(Money m1, Money m2)
             => m1.Value > m2.Value;

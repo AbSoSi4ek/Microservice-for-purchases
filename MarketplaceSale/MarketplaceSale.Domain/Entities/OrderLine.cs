@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MarketplaceSale.Domain.ValueObjects;
+using MarketplaceSale.Domain.Entities.Base;
 
 namespace MarketplaceSale.Domain.Entities
 {
-    public class OrderLine
+    public class OrderLine : Entity<Guid>
     {
         #region Properties
 
@@ -16,21 +17,30 @@ namespace MarketplaceSale.Domain.Entities
 
         public Quantity Quantity { get; private set; }
 
+        public Seller Seller { get; private set; } // эксперимент для связи в бд
+        // эксперимент удачный, но стоило ли это того 🥺
+
+
         #endregion
 
         #region Constructor
 
-        public OrderLine(Product product, Quantity quantity)
+        private OrderLine() { }
+        public OrderLine(Product product, Quantity quantity) : base(Guid.NewGuid())
         {
             if (product is null)
                 throw new ArgumentNullValueException(nameof(product));
 
-            if (quantity is null || quantity.Value <= 0)
+            if (quantity is null)
+                throw new ArgumentNullValueException(nameof(quantity));
+
+            if (quantity.Value <= 0)
                 throw new QuantityMustBePositiveException(product, quantity);
 
             Product = product;
             Quantity = quantity;
         }
+        
 
         #endregion
 
