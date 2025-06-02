@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace MarketplaceSale.Domain.Repositories.Abstractions
 {
-    // то же самое что и с картлайном
     public interface IOrderLineRepository : IRepository<OrderLine, Guid>
     { }
+}
+
+
     //{
     //    // Получить OrderLine по ID продукта (предполагается, что OrderLine уникально идентифицируется продуктом в рамках заказа)
     //    Task<OrderLine?> GetByProductIdAsync(Guid productId, CancellationToken cancellationToken = default);
@@ -26,4 +28,4 @@ namespace MarketplaceSale.Domain.Repositories.Abstractions
     //    // Проверка существования строки заказа по ID продукта
     //    Task<bool> ExistsAsync(Guid productId, CancellationToken cancellationToken = default);
     //}
-}
+

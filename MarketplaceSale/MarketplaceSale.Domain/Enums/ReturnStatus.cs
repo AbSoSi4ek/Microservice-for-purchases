@@ -13,7 +13,7 @@ namespace MarketplaceSale.Domain.Enums
         Approved,       //одобрен
         Rejected,       //отклонён
         Refunded,       //возврат выполнен
-        PartialRefunded //частичный возврат
+        //PartialRefunded //частичный возврат
     }
 }
 

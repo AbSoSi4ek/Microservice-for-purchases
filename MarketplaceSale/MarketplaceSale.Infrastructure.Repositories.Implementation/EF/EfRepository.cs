@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MarketplaceSale.Infrastructure.EntityFramework;
+﻿using MarketplaceSale.Infrastructure.EntityFramework;
 using MarketplaceSale.Domain.Repositories.Abstractions;
 using MarketplaceSale.Domain.Entities.Base;
 using Microsoft.EntityFrameworkCore;

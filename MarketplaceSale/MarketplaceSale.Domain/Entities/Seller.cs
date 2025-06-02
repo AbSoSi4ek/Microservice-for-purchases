@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MarketplaceSale.Domain.Entities.Base;
+using MarketplaceSale.Domain.Entities;
 using MarketplaceSale.Domain.Enums;
 using MarketplaceSale.Domain.Exceptions;
 using MarketplaceSale.Domain.ValueObjects;
@@ -66,6 +67,7 @@ namespace MarketplaceSale.Domain.Entities
 
             product.UnassignSeller(); // Отвязываем от продавца
             _products.Remove(product);
+            
         }
 
 
@@ -81,7 +83,7 @@ namespace MarketplaceSale.Domain.Entities
             product.SellerDecreaseStock(this, quantity);
         }
 
-        public void ChangeProductPrice(Product product, Price newPrice) // Изменить стоимость продукта
+        public void ChangeProductPrice(Product product, Money newPrice) // Изменить стоимость продукта
         {
             EnsureOwnership(product);
             product.ChangePrice(newPrice, this);
@@ -109,16 +111,17 @@ namespace MarketplaceSale.Domain.Entities
 
             order.ApproveReturn(this);
 
-            // Финализация возврата — возврат на баланс клиента
+            //Финализация возврата — возврат на баланс клиента
             var refundAmount = order.OrderLines
                 .Where(line => line.Product.Seller == this)
                 .Sum(line => line.Product.Price.Value * line.Quantity.Value);
 
             order.Client.AddBalance(new Money(refundAmount));
+            SubtractBalance(new Money(refundAmount));
             order.MarkAsRefunded(this);
         }
 
-
+        /*
         public void ProcessPartialRefund(Order order, Product product, Quantity quantity) // частичный возврат
         {
             if (order is null)
@@ -139,16 +142,8 @@ namespace MarketplaceSale.Domain.Entities
             SubtractBalance(refundAmount);
         }
 
-        public void ProcessFullRefund(Order order) // полный возврат
-        {
-            if (order is null)
-                throw new ArgumentNullValueException(nameof(order));
+        */
 
-            if (!SalesHistory.Contains(order))
-                throw new OrderDoesNotBelongToSellerException(order, this);
-
-            order.MarkAsRefunded(this);
-        }
 
 
         private void EnsureOwnership(Product product) // проверка владения продукта
@@ -181,9 +176,6 @@ namespace MarketplaceSale.Domain.Entities
 
             BusinessBalance -= amount;
         }
-
-
-
         #endregion
     }
 }

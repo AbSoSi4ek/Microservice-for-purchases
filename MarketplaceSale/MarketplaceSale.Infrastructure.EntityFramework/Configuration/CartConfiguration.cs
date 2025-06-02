@@ -17,11 +17,16 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
             builder.HasKey(c => c.Id);
             builder.Property(c => c.Id).ValueGeneratedOnAdd();
 
+            builder.Property<Guid>("ClientId");
+
             builder.HasOne(c => c.Client)
-                .WithOne(client => client.Cart) // навигация в Client
-                .HasForeignKey<Cart>("ClientId") // shadow FK в Cart
+                .WithOne(client => client.Cart)
+                .HasForeignKey<Cart>("ClientId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex("ClientId").IsUnique();
+
 
             builder.HasMany(c => c.CartLines)
                 .WithOne(cl => cl.Cart)
@@ -30,10 +35,8 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Navigation(c => c.CartLines)
-                .UsePropertyAccessMode(PropertyAccessMode.Field); // читается через _cartLines
-
-
-            builder.Property<Guid>("ClientId"); // shadow property
+                .UsePropertyAccessMode(PropertyAccessMode.Field); 
+ 
         }
     }
 

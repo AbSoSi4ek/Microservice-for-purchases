@@ -1,18 +1,14 @@
 ﻿using MarketPlaceSale.Application.Models.Cart;
 using MarketPlaceSale.Application.Services.Abstractions;
-using MarketplaceSale.Domain.ValueObjects;
 using MarketplaceSale.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MarketplaceSale.Domain.Repositories.Abstractions;
 using AutoMapper;
 
 namespace MarketPlaceSale.Application.Services
 {
-    public class CartApplicationService(ICartRepository repository, IClientRepository clientRepository, IMapper mapper) : ICartApplicationService
+    public class CartApplicationService(ICartRepository repository,
+        IClientRepository clientRepository, 
+        IMapper mapper) : ICartApplicationService
     {
         public async Task<IEnumerable<CartModel>> GetCartAsync(CancellationToken cancellationToken = default)
             => (await repository.GetAllAsync(cancellationToken = default, true))

@@ -10,8 +10,8 @@ namespace MarketplaceSale.Domain.ValueObjects.Validators
 {
     internal class DescriptionValidator : IValidator<string>
     {
-        public static int MIN_LENGTH => 3;
-        public static int MAX_LENGTH => 50;
+        public static int MIN_LENGTH => 10;
+        public static int MAX_LENGTH => 500;
 
         public void Validate(string value)
         {

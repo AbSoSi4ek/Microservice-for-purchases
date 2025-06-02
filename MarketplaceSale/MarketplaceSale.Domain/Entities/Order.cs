@@ -29,12 +29,10 @@ namespace MarketplaceSale.Domain.Entities
         private Order() { }
         public Client Client { get; private set; }
         //public Guid ClientId { get; private set; }
-        public Client? ClientReturning { get; private set; } // потому что этот мудак не умеет делать связь 😥
-        // EF Core — одно навигационное свойство = одна связь. Но нахуй его отправляли многократно
+        public Client? ClientReturning { get; private set; } // потому что этот молодец не умеет делать связь 😥
+        // EF Core — одно навигационное свойство = одна связь
 
-        public Seller Seller { get; private set; }
-
-        //public Guid SellerId { get; private set; }
+        public Client? ClientHistory { get; private set; }
 
         public IReadOnlyCollection<OrderLine> OrderLines => new ReadOnlyCollection<OrderLine>(_orderLines.ToList());
 
@@ -92,7 +90,7 @@ namespace MarketplaceSale.Domain.Entities
             return new Money(_orderLines.Sum(l => l.Product.Price.Value * l.Quantity.Value));
         }
 
-        /*public void AddProduct(Product product, Quantity quantity)
+        public void AddProduct(Product product, Quantity quantity)
         {
             if (product is null)
                 throw new ArgumentNullValueException(nameof(product));
@@ -117,24 +115,20 @@ namespace MarketplaceSale.Domain.Entities
                 throw new ProductNotInCartException(product);
 
             _orderLines.Remove(line);
-        }*/
+        }
+
+        public void MarkAsPending() // заказ оплачен
+        {
+            if (Status == OrderStatus.Paid) // ошибка : заказ уже оплатили
+                throw new InvalidOrderStatusChangeException(Status, OrderStatus.Paid);
+
+            Status = OrderStatus.Pending;
+        }
 
         public void MarkAsPaid() // заказ оплачен
         {
-            if (Status != OrderStatus.Pending)
+            if (Status != OrderStatus.Pending) // заказ не оформлен
                 throw new InvalidOrderStatusChangeException(Status, OrderStatus.Paid);
-
-            foreach (var line in _orderLines)
-            {
-                var seller = line.Product.Seller;
-                seller.ReduceProductStock(line.Product, line.Quantity);
-                var sellerSum = _orderLines
-                    .Where(l => l.Product.Seller == seller)
-                    .Sum(l => l.Product.Price.Value * l.Quantity.Value);
-                seller.AddBalance(new Money(sellerSum));
-
-                seller.AddSaleHistory(this);
-            }
 
             Status = OrderStatus.Paid;
         }
@@ -165,7 +159,7 @@ namespace MarketplaceSale.Domain.Entities
         }
 
 
-        public void Cancel() // заказ отменён
+        public void MarkAsCancelled() // заказ отменён
         {
             if (Status != OrderStatus.Paid)
                 throw new InvalidOrderCancellationException(Status);
@@ -173,19 +167,42 @@ namespace MarketplaceSale.Domain.Entities
             Status = OrderStatus.Cancelled;
         }
 
-        public void RequestReturn(Seller seller) // запрос на возврат
+        public void RequestProductReturn(Seller seller, Product product, Quantity quantity)
         {
+            if (seller is null)
+                throw new ArgumentNullValueException(nameof(seller));
+
+            if (product is null)
+                throw new ArgumentNullValueException(nameof(product));
+
+            if (quantity is null || quantity.Value <= 0)
+                throw new QuantityMustBePositiveException(product, quantity);
+
             if (Status != OrderStatus.Completed)
                 throw new InvalidReturnRequestException(Status);
 
-            if (_returnStatuses.TryGetValue(seller, out var status) && status != ReturnStatus.None)
-                throw new ReturnAlreadyInProgressException(status);
+            var orderLine = _orderLines.FirstOrDefault(line =>
+                line.Product == product && line.Product.Seller == seller);
 
-            if (!_orderLines.Any(line => line.Product.Seller == seller))
-                throw new SellerNotFoundException(this.Status);
+            if (orderLine == null)
+                throw new ProductNotInOrderException(product);
+
+            if (quantity.Value > orderLine.Quantity.Value)
+                throw new InvalidRefundQuantityException(product, quantity, orderLine.Quantity.Value);
+
+            // Инициализируем структуру возвратов, если надо
+            if (!_returnStatuses.ContainsKey(seller))
+                _returnStatuses[seller] = ReturnStatus.None;
+
+            if (_returnStatuses[seller] != ReturnStatus.None)
+                throw new ReturnAlreadyInProgressException(_returnStatuses[seller]);
 
             _returnStatuses[seller] = ReturnStatus.Requested;
+
+            // Добавим запись о том, что конкретный товар в этом количестве подлежит возврату
+            _returnedProducts.Add(product, quantity);
         }
+
 
 
         public void RejectReturn(Seller seller) // возврат отклонён
@@ -208,10 +225,17 @@ namespace MarketplaceSale.Domain.Entities
             if (!_returnStatuses.TryGetValue(seller, out var status) || status != ReturnStatus.Requested)
                 throw new ReturnNotRequestedException();
 
+            foreach (var line in _orderLines.Where(l => l.Product.Seller == seller))
+            {
+                var quantity = line.Quantity;
+                line.Product.OrderRefundStock(seller, quantity);
+            }
+
             _returnStatuses[seller] = ReturnStatus.Approved;
+            //Status = OrderStatus.CancelledDueToRefund;
         }
 
-
+        /*
         public void PartialRefund(Seller seller, Product product, Quantity quantity) // частичный возврат
         {
             if (!_returnStatuses.TryGetValue(seller, out var status) || status != ReturnStatus.Approved)
@@ -251,7 +275,7 @@ namespace MarketplaceSale.Domain.Entities
             else
                 _returnStatuses[seller] = ReturnStatus.PartialRefunded;
         }
-
+        */
 
         public void MarkAsRefunded(Seller seller)
         {
@@ -277,8 +301,8 @@ namespace MarketplaceSale.Domain.Entities
 
         public void MarkAsNoneRefunded(Seller seller)
         {
-            if (!_returnStatuses.TryGetValue(seller, out var status) || status != ReturnStatus.Approved)
-                throw new ReturnNotApprovedException();
+            //if (!_returnStatuses.TryGetValue(seller, out var status) || status != ReturnStatus.Approved)
+            //    throw new ReturnNotApprovedException();
 
             _returnStatuses[seller] = ReturnStatus.None;
         }
@@ -291,4 +315,3 @@ namespace MarketplaceSale.Domain.Entities
         #endregion
     }
 }
-//ненавижу блять то что я делаю

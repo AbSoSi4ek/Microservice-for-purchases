@@ -11,7 +11,7 @@ namespace MarketplaceSale.Domain.ValueObjects.Validators
     public sealed class ProductNameValidator : IValidator<string>
     {
         public static int MIN_LENGTH => 3;
-        public static int MAX_LENGTH => 50;
+        public static int MAX_LENGTH => 100;
 
         public void Validate(string value)
         {

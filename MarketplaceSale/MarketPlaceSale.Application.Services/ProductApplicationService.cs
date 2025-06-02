@@ -3,16 +3,13 @@ using MarketplaceSale.Domain.Repositories.Abstractions;
 using MarketPlaceSale.Application.Models.Product;
 using MarketPlaceSale.Application.Services.Abstractions;
 using MarketplaceSale.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MarketplaceSale.Domain.ValueObjects;
 
 namespace MarketPlaceSale.Application.Services
 {
-    public class ProductApplicationService(IProductRepository repository, ISellerRepository SellerRepository, IMapper mapper) : IProductApplicationService
+    public class ProductApplicationService(IProductRepository repository,
+        ISellerRepository SellerRepository, 
+        IMapper mapper) : IProductApplicationService
     {
         public async Task<IEnumerable<ProductModel>> GetProductAsync(CancellationToken cancellationToken = default)
             => (await repository.GetAllAsync(cancellationToken = default, true))
@@ -24,11 +21,6 @@ namespace MarketPlaceSale.Application.Services
             return Product is null ? null : mapper.Map<ProductModel>(Product);
         }
 
-        /*public async Task<ProductModel?> GetProductByProductNameAsync(string username, CancellationToken cancellationToken = default)
-        {
-            var Product = await repository.GetProductByProductNameAsync(username, cancellationToken);
-            return Product is null ? null : mapper.Map<ProductModel>(Product);
-        }*/
         public async Task<ProductModel?> CreateProductAsync(CreateProductModel ProductInformation, CancellationToken cancellationToken = default)
         {
             var Seller = await SellerRepository.GetByIdAsync(ProductInformation.SellerId, cancellationToken);

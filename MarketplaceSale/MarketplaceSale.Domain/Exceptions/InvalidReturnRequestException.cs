@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MarketplaceSale.Domain.Exceptions
 {
     public class InvalidReturnRequestException(OrderStatus currentStatus)
-        : InvalidOperationException($"Cannot request return: order must be 'Delivered', but current status is '{currentStatus}'.")
+        : InvalidOperationException($"Cannot request return: order must be 'Completed, but current status is '{currentStatus}'.")
     {
         public OrderStatus CurrentStatus => currentStatus;
     }

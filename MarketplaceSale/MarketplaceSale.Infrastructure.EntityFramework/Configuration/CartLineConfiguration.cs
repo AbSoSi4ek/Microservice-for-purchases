@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MarketplaceSale.Domain.ValueObjects;
-using System;
 
 namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
 {
@@ -20,7 +19,7 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(cl => cl.Product)
-                .WithMany()   // у Product нет навигации к CartLine
+                .WithMany()
                 .HasForeignKey("ProductId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
@@ -34,11 +33,8 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
             builder.Property(cl => cl.SelectionStatus)
                 .IsRequired()
                 .HasConversion<int>();
-
-            builder.Property<Guid>("CartId");
-            builder.Property<Guid>("ProductId");
-
         }
     }
-
 }
+
+

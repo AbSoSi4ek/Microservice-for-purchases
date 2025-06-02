@@ -1,9 +1,4 @@
 ﻿using MarketplaceSale.Domain.Entities.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MarketplaceSale.Domain.Repositories.Abstractions
 {
@@ -19,3 +14,4 @@ namespace MarketplaceSale.Domain.Repositories.Abstractions
         Task<bool> DeleteAsync(TId id, CancellationToken cancellationToken);
     }
 }
+

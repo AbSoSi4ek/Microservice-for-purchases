@@ -29,7 +29,7 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
                 .HasConversion(
                     d => d.Value,
                     v => new Description(v))
-                .HasMaxLength(50);
+                .HasMaxLength(500);
 
             builder.Property(p => p.Price)
                 .IsRequired()
@@ -44,12 +44,11 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
                     value => new Quantity(value));
 
             builder.HasOne(p => p.Seller)
-                .WithMany("_products")  // связываем с полем Seller._products
+                .WithMany("_products")
                 .HasForeignKey("SellerId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Для теневого свойства SellerId (если его нет в классе)
             builder.Property<Guid>("SellerId");
 
         }

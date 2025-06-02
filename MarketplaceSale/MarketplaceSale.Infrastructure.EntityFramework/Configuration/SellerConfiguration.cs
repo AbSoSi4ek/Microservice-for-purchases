@@ -38,17 +38,17 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Навигация к истории продаж (Seller -> Orders)
-            builder.HasMany<Order>("_salesHistory")
-                .WithOne(o => o.Seller)  // предполагается, что в Order есть свойство Seller
+            /*/builder.HasMany<Order>("_salesHistory")
+                .WithOne(o => o.Seller)  
                 .HasForeignKey("SellerId")
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict);*/
 
             builder.Navigation("_products").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Navigation("_salesHistory").UsePropertyAccessMode(PropertyAccessMode.Field);
+            //builder.Navigation("_salesHistory").UsePropertyAccessMode(PropertyAccessMode.Field);
 
             // Игнорируем публичные коллекции-обертки, т.к. они не являются сущностями EF
             builder.Ignore(s => s.AvailableProducts);
-            builder.Ignore(s => s.SalesHistory);
+            //builder.Ignore(s => s.SalesHistory);
         }
     }
 

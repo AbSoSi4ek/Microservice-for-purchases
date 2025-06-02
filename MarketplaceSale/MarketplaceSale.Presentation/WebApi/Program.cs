@@ -7,8 +7,6 @@ namespace WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            //builder.Logging.AddConsole(); // логгирование в консоли 
-
             var dbConnectionString = builder.Configuration.GetConnectionString(nameof(ApplicationDbContext));
 
             if (string.IsNullOrEmpty(dbConnectionString))
@@ -22,16 +20,13 @@ namespace WebApi
 
             });
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -49,3 +44,5 @@ namespace WebApi
         }
     }
 }
+
+

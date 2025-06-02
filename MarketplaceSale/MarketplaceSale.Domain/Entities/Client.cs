@@ -11,7 +11,7 @@ using MarketplaceSale.Domain.Enums;
 
 namespace MarketplaceSale.Domain.Entities
 {
-    public class Client(Guid id, Username username) : Entity<Guid>(id)
+    public class Client/*(Guid id, Username username)*/ : Entity<Guid>/*(id)*/
     {
         #region Fields
 
@@ -22,21 +22,32 @@ namespace MarketplaceSale.Domain.Entities
 
         #region Properties
 
-        public Username Username { get; private set; } = username ?? throw new ArgumentNullValueException(nameof(username));
+        public Username Username { get; private set; }/*= username ?? throw new ArgumentNullValueException(nameof(username));*/
 
         public Money AccountBalance { get; private set; } = new(0);
 
-        public Cart Cart { get; private set; } = null!;
+        public Cart Cart { get; private set; } 
 
 
         public IReadOnlyCollection<Order> PurchaseHistory => _purchaseHistory.AsReadOnly();
         public IReadOnlyCollection<Order> ReturnHistory => _returnHistory.AsReadOnly();
 
-        /*public IReadOnlyCollection<Order> PurchaseHistory => _purchaseHistory.ToList().AsReadOnly();
-
-        public IReadOnlyCollection<Order> ReturnHistory => _returnHistory.ToList().AsReadOnly();*/
-
         #endregion // Properties
+
+        #region Constructors
+        protected Client() { }
+
+        public Client(Username username)
+            : this(Guid.NewGuid(), username) { }
+
+        protected Client(Guid id, Username username)
+            : base(id)
+        {
+            Username = username ?? throw new ArgumentNullValueException(nameof(username));
+            AccountBalance = new Money(0);
+            Cart = new Cart(this); 
+        }
+        #endregion //Constructors
 
         #region Behavior
 
@@ -55,6 +66,8 @@ namespace MarketplaceSale.Domain.Entities
                 throw new ArgumentNullValueException(nameof(product));
             if (quantity is null || quantity.Value <= 0)
                 throw new QuantityMustBePositiveException(product, quantity);
+            if (product.Seller is null)
+                throw new ProductWithoutSellerException(product);
 
             Cart.AddProduct(product, quantity);
         }
@@ -123,13 +136,13 @@ namespace MarketplaceSale.Domain.Entities
 
         public Order PlaceSelectedOrderFromCart() // сделать заказ из выбранных в корзине товаров
         {
-
+            
             var selectedLines = Cart.CartLines
                 .Where(line => line.SelectionStatus == CartSelectionStatus.Selected)
                 .ToList();
 
             if (!selectedLines.Any())
-                throw new CartSelectionEmptyException(); // нужно создать исключение
+                throw new CartSelectionEmptyException();
 
             foreach (var line in selectedLines)
             {
@@ -139,9 +152,15 @@ namespace MarketplaceSale.Domain.Entities
                     throw new NotEnoughStockException(line.Product, line.Quantity);
             }
 
-            var selectedProducts = selectedLines
-                .SelectMany(line => Enumerable.Repeat(line.Product, line.Quantity.Value))
-                .ToList();
+            var selectedProducts = new List<Product>();
+
+            foreach (var line in selectedLines)
+            {
+                for (int i = 0; i < line.Quantity!.Value; i++)
+                {
+                    selectedProducts.Add(line.Product);
+                }
+            }
 
             var total = selectedProducts.Sum(p => p.Price.Value);
             var totalMoney = new Money(total);
@@ -149,15 +168,13 @@ namespace MarketplaceSale.Domain.Entities
             if (totalMoney > AccountBalance)
                 throw new NotEnoughFundsException(AccountBalance, totalMoney);
 
+            // Всё работает со старым конструктором
             var order = new Order(this, selectedProducts);
-            foreach (var group in selectedProducts.GroupBy(p => p))
-            {
-                var quantity = new Quantity(group.Count());
-                group.Key.OrderRemoveStock(group.Key.Seller, quantity);
-            }
 
+            order.MarkAsPending();
             _purchaseHistory.Add(order);
             Cart.ClearSelected();
+
             return order;
         }
 
@@ -175,8 +192,8 @@ namespace MarketplaceSale.Domain.Entities
             var products = Enumerable.Repeat(product, quantity.Value).ToList();
             var order = new Order(this, products); // статус будет Pending
 
+            order.MarkAsPending();
             _purchaseHistory.Add(order);
-
             return order;
         }
 
@@ -188,7 +205,7 @@ namespace MarketplaceSale.Domain.Entities
             if (order.Client != this)
                 throw new UnauthorizedOrderAccessException(this, order);
             if (order.Status != OrderStatus.Pending)
-                throw new InvalidOrderStatusChangeException(order.Status, OrderStatus.Paid);
+                throw new InvalidOrderStatusChangeException(order.Status, OrderStatus.Pending);
 
             var total = order.CalculateTotal();
 
@@ -217,45 +234,46 @@ namespace MarketplaceSale.Domain.Entities
             if (order.Status != OrderStatus.Paid)
                 throw new InvalidOrderCancellationException(order.Status);
 
-            order.Cancel();
-            AddBalance(order.TotalAmount);
+            foreach (var line in order.OrderLines)
+            {
+                line.Product.OrderRefundStock(line.Product.Seller, line.Quantity); // или другой метод
+                line.Product.Seller.SubtractBalance(new Money(line.Product.Price.Value * line.Quantity.Value));
+            }
+
+            AddBalance(order.CalculateTotal());
+            order.MarkAsCancelled();
         }
 
-        public void RequestReturnOrder(Order order, Seller seller) // запрос на возврат товара
+
+
+
+
+        public void RequestProductReturn(Order order, Product product, Quantity quantity)
         {
             if (order is null)
                 throw new ArgumentNullValueException(nameof(order));
-            if (seller is null)
-                throw new ArgumentNullValueException(nameof(seller));
+            if (product is null)
+                throw new ArgumentNullValueException(nameof(product));
+            if (quantity is null || quantity.Value <= 0)
+                throw new QuantityMustBePositiveException(product, quantity);
             if (order.Client != this)
                 throw new UnauthorizedOrderAccessException(this, order);
             if (order.Status != OrderStatus.Completed)
                 throw new InvalidReturnRequestException(order.Status);
 
-            order.RequestReturn(seller);
+            var seller = product.Seller;
+            var orderLine = order.OrderLines.FirstOrDefault(ol => ol.Product == product);
+
+            if (orderLine is null)
+                throw new ProductNotInOrderException(product);
+            if (quantity.Value > orderLine.Quantity.Value)
+                throw new InvalidRefundQuantityException(product, quantity, orderLine.Quantity.Value);
+
+            //order.ReturnStatuses
+            order.RequestProductReturn(seller, product, quantity);
 
             if (!_returnHistory.Contains(order))
                 _returnHistory.Add(order);
-        }
-
-
-        public void FinalizeApprovedReturn(Order order, Seller seller) // возврат товара
-        {
-            if (order is null)
-                throw new ArgumentNullValueException(nameof(order));
-            if (seller is null)
-                throw new ArgumentNullValueException(nameof(seller));
-            if (order.Client != this)
-                throw new UnauthorizedOrderAccessException(this, order);
-
-            order.MarkAsRefunded(seller);
-
-            // Возврат средств за товары этого продавца
-            var refundAmount = order.OrderLines
-                .Where(line => line.Product.Seller == seller)
-                .Sum(line => line.Product.Price.Value * line.Quantity.Value);
-
-            AddBalance(new Money(refundAmount));
         }
 
 
@@ -274,10 +292,10 @@ namespace MarketplaceSale.Domain.Entities
 
             order.MarkAsNoneRefunded(seller);
         }
-
+        
 
 
         #endregion // Ordering
     }
-    
+
 }

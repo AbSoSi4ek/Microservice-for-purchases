@@ -1,31 +1,50 @@
 ﻿using MarketplaceSale.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MarketplaceSale.Domain.ValueObjects;
 using MarketplaceSale.Domain.Entities.Base;
 
 namespace MarketplaceSale.Domain.Entities
 {
+    /// <summary>
+    /// Представляет одну строку заказа, содержащую информацию о товаре, его количестве и продавце.
+    /// </summary>
     public class OrderLine : Entity<Guid>
     {
         #region Properties
 
+        /// <summary>
+        /// Ссылка на заказ, к которому относится данная строка.
+        /// </summary>
+        public Order Order { get; set; }
+
+        /// <summary>
+        /// Продукт, указанный в строке заказа.
+        /// </summary>
         public Product Product { get; }
 
+        /// <summary>
+        /// Количество товара.
+        /// </summary>
         public Quantity Quantity { get; private set; }
 
-        public Seller Seller { get; private set; } // эксперимент для связи в бд
-        // эксперимент удачный, но стоило ли это того 🥺
-
+        /// <summary>
+        /// Продавец, предоставивший указанный товар.
+        /// </summary>
+        public Seller Seller { get; private set; }
 
         #endregion
 
         #region Constructor
-
+        /// <summary>
+        /// Приватный конструктор для EF.
+        /// </summary>
         private OrderLine() { }
+        /// <summary>
+        /// Создаёт новый экземпляр строки заказа с указанным продуктом и количеством.
+        /// </summary>
+        /// <param name="product">Продукт, добавляемый в заказ.</param>
+        /// <param name="quantity">Количество единиц товара.</param>
+        /// <exception cref="ArgumentNullValueException">Выбрасывается, если продукт или количество не указаны.</exception>
+        /// <exception cref="QuantityMustBePositiveException">Выбрасывается, если количество товара не положительно.</exception>
         public OrderLine(Product product, Quantity quantity) : base(Guid.NewGuid())
         {
             if (product is null)
