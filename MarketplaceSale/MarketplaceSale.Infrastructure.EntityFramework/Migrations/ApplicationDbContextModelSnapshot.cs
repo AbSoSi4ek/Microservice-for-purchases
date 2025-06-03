@@ -91,6 +91,9 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ClientHistoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("ClientId")
                         .HasColumnType("uuid");
 
@@ -113,6 +116,8 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClientHistoryId");
 
                     b.HasIndex("ClientId");
 
@@ -160,8 +165,8 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
@@ -235,6 +240,10 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Migrations
 
             modelBuilder.Entity("MarketplaceSale.Domain.Entities.Order", b =>
                 {
+                    b.HasOne("MarketplaceSale.Domain.Entities.Client", "ClientHistory")
+                        .WithMany()
+                        .HasForeignKey("ClientHistoryId");
+
                     b.HasOne("MarketplaceSale.Domain.Entities.Client", "Client")
                         .WithMany("_purchaseHistory")
                         .HasForeignKey("ClientId")
@@ -252,12 +261,14 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Migrations
 
                     b.Navigation("Client");
 
+                    b.Navigation("ClientHistory");
+
                     b.Navigation("ClientReturning");
                 });
 
             modelBuilder.Entity("MarketplaceSale.Domain.Entities.OrderLine", b =>
                 {
-                    b.HasOne("MarketplaceSale.Domain.Entities.Order", null)
+                    b.HasOne("MarketplaceSale.Domain.Entities.Order", "Order")
                         .WithMany("_orderLines")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -274,6 +285,8 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Migrations
                         .HasForeignKey("SellerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
 

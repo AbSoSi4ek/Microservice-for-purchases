@@ -33,7 +33,7 @@ namespace MarketplaceSale.Domain.Entities
         // EF Core — одно навигационное свойство = одна связь
 
         public Client? ClientHistory { get; private set; }
-
+        public Guid? ClientReturningId { get; private set; }
         public IReadOnlyCollection<OrderLine> OrderLines => new ReadOnlyCollection<OrderLine>(_orderLines.ToList());
 
 

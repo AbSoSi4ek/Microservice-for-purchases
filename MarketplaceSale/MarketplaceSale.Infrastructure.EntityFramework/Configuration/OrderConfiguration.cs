@@ -57,10 +57,12 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
                    .IsRequired(false);
 
             builder.HasMany<OrderLine>("_orderLines")
-                   .WithOne()
-                   .HasForeignKey("OrderId")
-                   .IsRequired()
-                   .OnDelete(DeleteBehavior.Cascade);
+               .WithOne(ol => ol.Order)
+               .HasForeignKey(ol => ol.OrderId)
+               .IsRequired()
+               .OnDelete(DeleteBehavior.Cascade);
+
+
 
             builder.Navigation("_orderLines")
                    .UsePropertyAccessMode(PropertyAccessMode.Field);

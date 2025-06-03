@@ -29,11 +29,11 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
                    .OnDelete(DeleteBehavior.Restrict);
 
 
-            builder.HasOne<Order>()
+            builder.HasOne(ol => ol.Order)
                    .WithMany("_orderLines")
-                   .HasForeignKey("OrderId")
-                   .IsRequired()
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey(ol => ol.OrderId)
+                   .IsRequired();
+
 
             // Правильное маппинг value object'а
             builder.Property(ol => ol.Quantity)
@@ -41,7 +41,7 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
                     q => q.Value,
                     v => new Quantity(v))
                 .IsRequired();
-            
+
 
         }
     }

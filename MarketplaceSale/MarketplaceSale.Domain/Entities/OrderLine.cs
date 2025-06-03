@@ -15,6 +15,7 @@ namespace MarketplaceSale.Domain.Entities
         /// Ссылка на заказ, к которому относится данная строка.
         /// </summary>
         public Order Order { get; set; }
+        public Guid OrderId { get; set; }
 
         /// <summary>
         /// Продукт, указанный в строке заказа.
@@ -59,7 +60,7 @@ namespace MarketplaceSale.Domain.Entities
             Product = product;
             Quantity = quantity;
         }
-        
+
 
         #endregion
 

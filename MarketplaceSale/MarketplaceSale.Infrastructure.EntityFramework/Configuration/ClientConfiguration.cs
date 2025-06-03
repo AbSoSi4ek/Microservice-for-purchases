@@ -38,7 +38,7 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
 
             builder.HasMany<Order>("_purchaseHistory")
                 .WithOne(o => o.Client)
-                .HasForeignKey("ClientHistory")
+                .HasForeignKey("ClientId")
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany<Order>("_returnHistory")
@@ -51,6 +51,7 @@ namespace MarketplaceSale.Infrastructure.EntityFramework.Configuration
 
             builder.Ignore(c => c.PurchaseHistory);
             builder.Ignore(c => c.ReturnHistory);
+
         }
     }
 
